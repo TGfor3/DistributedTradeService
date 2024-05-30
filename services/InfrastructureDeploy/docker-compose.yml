@@ -1,0 +1,130 @@
+---
+version: '3.3'
+services:
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - trade-server-network
+
+  # rabbit_mq:
+  #   image: rabbitmq:3.8-rc-management
+  #   container_name: rabbit_mq
+  #   ports:
+  #     - '5672:5672'
+  #     - '15672:15672'
+  #   volumes:
+  #     - rabbit_mqdata:/usr/share/rabbitmq/data
+  #   networks:
+  #     - trade-server-network
+
+  kafka:
+    image: ghcr.io/s24-capstone-distributed/tradeserverkafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://192.168.8.157:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CREATE_TOPICS: "MarketValueTopic:3:1"
+    networks:
+      - trade-server-network
+
+  # connect:
+  #   image: ghcr.io/s24-capstone-distributed/tradeservermongokafkaconnect:latest
+  #   ports:
+  #     - "35000:35000"
+  #   hostname: connect
+  #   container_name: connect
+  #   depends_on:
+  #     - zookeeper
+  #     - kafka
+  #   environment:
+  #     KAFKA_JMX_PORT: 35000
+  #     KAFKA_JMX_HOSTNAME: localhost
+  #     CONNECT_BOOTSTRAP_SERVERS: "kafka:29092"
+  #     CONNECT_REST_ADVERTISED_HOST_NAME: connect
+  #     CONNECT_REST_PORT: 8083
+  #     CONNECT_GROUP_ID: connect-cluster-group
+  #     CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+  #     CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+  #     CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
+  #     CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+  #     CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+  #     CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+  #     CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+  #     CONNECT_ZOOKEEPER_CONNECT: "zookeeper:2181"
+  #     CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
+  #     CONNECT_CONNECTIONS_MAX_IDLE_MS: 180000
+  #     CONNECT_METADATA_MAX_AGE_MS: 180000
+  #     CONNECT_AUTO_CREATE_TOPICS_ENABLE: "true"
+  #     CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+  #     CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+  #   networks:
+  #     - trade-server-network
+
+  # mongodb:
+  #   image: ghcr.io/s24-capstone-distributed/tradeservermongo:latest
+  #   container_name: mongodb
+  #   ports:
+  #     - 27017:27017
+  #   networks:
+  #     - trade-server-network
+
+  # mongoseeder:
+  #   image: ghcr.io/s24-capstone-distributed/tradeservermongosetup:latest
+  #   container_name: mongoseeder
+  #   networks:
+  #     - trade-server-network
+  #   depends_on:
+  #     - mongodb
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8080:8080
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'
+    volumes:
+      - ./config.yml:/etc/kafkaui/dynamic_config.yaml
+    networks:
+      - trade-server-network
+
+  # postgresdb:
+  #   image: ghcr.io/s24-capstone-distributed/tradeserverpostgres:latest
+  #   restart: always
+  #   networks:
+  #     - trade-server-network
+  #   ports:
+  #     - "5432:5432"
+
+  # grafana:
+  #   image: grafana/grafana-oss
+  #   container_name: grafana
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - trade-server-network
+  #   volumes:
+  #     - grafana-storage:/var/lib/grafana
+
+
+
+networks:
+  trade-server-network:
+    driver: bridge
+
+volumes:
+  grafana-storage:
+  rabbit_mqdata:
+  mongo-data:

@@ -1,0 +1,1 @@
+TransactionIDGenerator does not persist  txID (but is a singleton)

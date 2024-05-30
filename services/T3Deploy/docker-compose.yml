@@ -1,0 +1,35 @@
+---
+services:
+  mvc1:
+    image: ghcr.io/s24-capstone-distributed/tradeservermarketvaluecalculator:latest
+    environment:
+      MACHINE_ID: 1
+      KAFKA_URL: ${KAFKA_BOOTSTRAP_SERVERS}
+      MONGO_CONNECTION_URI: ${MONGO_URL}
+    networks:
+      - trade-server-t3-network
+    restart: always 
+
+  mvc2:
+    image: ghcr.io/s24-capstone-distributed/tradeservermarketvaluecalculator:latest
+    environment:
+      MACHINE_ID: 2
+      KAFKA_URL: ${KAFKA_BOOTSTRAP_SERVERS}
+      MONGO_CONNECTION_URI: ${MONGO_URL}
+    networks:
+      - trade-server-t3-network
+    restart: always 
+
+  mvc3:
+    image: ghcr.io/s24-capstone-distributed/tradeservermarketvaluecalculator:latest
+    environment:
+      MACHINE_ID: 3
+      KAFKA_URL: ${KAFKA_BOOTSTRAP_SERVERS}
+      MONGO_CONNECTION_URI: ${MONGO_URL}
+    networks:
+      - trade-server-t3-network
+    restart: always 
+
+networks:
+  trade-server-t3-network:
+    driver: bridge

@@ -1,0 +1,161 @@
+version: '3.8'
+services:
+  tradeservice:
+    build:
+      context: ./TradeService
+      dockerfile: Dockerfile
+    container_name: tradeservice
+    ports:
+      - '5000:5000'
+    environment:
+      AMQP_URL: ${pikaURL}
+      MONGO_URL: ${MONGO_URL}
+      TRADE_QUEUE_NAME: ${TRADESERVICE_QUEUE_NAME}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      # RABBITMQ_USERPASS: ${RABBITMQ_USERPASS}
+    volumes:
+      - ./tradeservice:/app
+    networks:
+      - backend
+
+  java_orchestrator_node:
+    build:
+      context: ./Java_Orchestrator_Node
+      dockerfile: Dockerfile
+    container_name: java_orchestrator_node
+    depends_on:
+      - tradeservice
+    environment:
+      KAFKA_TOPIC_NAME: ${KAFKA_TOPIC_NAME}
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+      RABBITMQ_URI: ${RABBITMQ_URI}
+      SERVICE_QUEUE_NAME: ${TRADESERVICE_QUEUE_NAME}
+      PORTFOLIO_QUEUE_NAME: ${PORTFOLIO_QUEUE_NAME}
+      STOCK_QUEUE_NAME: ${STOCK_QUEUE_NAME}
+      ROUTING_KEY_START: ${ROUTING_KEY_START}
+      EXCHANGE_NAME: ${EXCHANGE_NAME}
+      RECEIVE_QUEUE_NAME: ${RECEIVE_QUEUE_NAME}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+    volumes:
+      - ./java_orchestrator_node:/app/target
+    networks:
+      - backend
+
+  java_orchestrator_node2:
+    build:
+      context: ./Java_Orchestrator_Node
+      dockerfile: Dockerfile
+    container_name: java_orchestrator_node2
+    depends_on:
+      - tradeservice
+    environment:
+      KAFKA_TOPIC_NAME: ${KAFKA_TOPIC_NAME}
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+      RABBITMQ_URI: ${RABBITMQ_URI}
+      SERVICE_QUEUE_NAME: ${TRADESERVICE_QUEUE_NAME}
+      PORTFOLIO_QUEUE_NAME: ${PORTFOLIO_QUEUE_NAME}
+      STOCK_QUEUE_NAME: ${STOCK_QUEUE_NAME}
+      ROUTING_KEY_START: ${ROUTING_KEY_START}
+      EXCHANGE_NAME: ${EXCHANGE_NAME}
+      RECEIVE_QUEUE_NAME: ${RECEIVE_QUEUE_NAME}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+    volumes:
+      - ./java_orchestrator_node2:/app/target
+    networks:
+      - backend
+
+  java_clientacc_node:
+    build:
+      context: ./Java_mongo_Node
+      dockerfile: Dockerfile
+    container_name: java_clientacc_node
+    depends_on:
+      - tradeservice
+    environment:
+      RABBIT_URI: ${RABBITMQ_URI}
+      MONGO_URI: ${MONGO_URL}
+      RABBIT_QUEUE_NAME: ${PORTFOLIO_QUEUE_NAME}
+      RECEIVE_QUEUE_NAME: ${RECEIVE_QUEUE_NAME}
+      NODE_TYPE: 'CLIENT_COLLECTION'
+      COLLECTION_TYPE: 'CLIENT_COLLECTION'
+      EXCHANGE_NAME: ${EXCHANGE_NAME}
+      ROUTING_KEY_START: ${ROUTING_KEY_START}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+    volumes:
+      - ./java_clientacc_node:/app/target
+    networks:
+      - backend
+
+  java_clientacc_node2:
+    build:
+      context: ./Java_mongo_Node
+      dockerfile: Dockerfile
+    container_name: java_clientacc_node2
+    depends_on:
+      - tradeservice
+    environment:
+      RABBIT_URI: ${RABBITMQ_URI}
+      MONGO_URI: ${MONGO_URL}
+      RABBIT_QUEUE_NAME: ${PORTFOLIO_QUEUE_NAME}
+      RECEIVE_QUEUE_NAME: ${RECEIVE_QUEUE_NAME}
+      NODE_TYPE: 'CLIENT_COLLECTION'
+      COLLECTION_TYPE: 'CLIENT_COLLECTION'
+      EXCHANGE_NAME: ${EXCHANGE_NAME}
+      ROUTING_KEY_START: ${ROUTING_KEY_START}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+    volumes:
+      - ./java_clientacc_node2:/app/target
+    networks:
+      - backend
+
+  java_broker_node:
+    build:
+      context: ./Java_mongo_Node
+      dockerfile: Dockerfile
+    container_name: java_broker_node
+    depends_on:
+      - tradeservice
+    environment:
+      RABBIT_URI: ${RABBITMQ_URI}
+      MONGO_URI: ${MONGO_URL}
+      RABBIT_QUEUE_NAME: ${STOCK_QUEUE_NAME}
+      RECEIVE_QUEUE_NAME: ${RECEIVE_QUEUE_NAME}
+      NODE_TYPE: 'BROKERAGE_COLLECTION'
+      COLLECTION_TYPE: 'BROKERAGE_COLLECTION'
+      EXCHANGE_NAME: ${EXCHANGE_NAME}
+      ROUTING_KEY_START: ${ROUTING_KEY_START}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+    volumes:
+      - ./target:/app/target
+    networks:
+      - backend
+
+  java_broker_node2:
+    build:
+      context: ./Java_mongo_Node
+      dockerfile: Dockerfile
+    container_name: java_broker_node2
+    depends_on:
+      - tradeservice
+    environment:
+      RABBIT_URI: ${RABBITMQ_URI}
+      MONGO_URI: ${MONGO_URL}
+      RABBIT_QUEUE_NAME: ${STOCK_QUEUE_NAME}
+      RECEIVE_QUEUE_NAME: ${RECEIVE_QUEUE_NAME}
+      NODE_TYPE: 'BROKERAGE_COLLECTION'
+      COLLECTION_TYPE: 'BROKERAGE_COLLECTION'
+      EXCHANGE_NAME: ${EXCHANGE_NAME}
+      ROUTING_KEY_START: ${ROUTING_KEY_START}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+    volumes:
+      - ./target2:/app/target
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

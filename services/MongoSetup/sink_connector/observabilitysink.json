@@ -1,0 +1,16 @@
+{
+    "name": "postgres-sink",
+    "config": {
+        "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+        "topics": "ObservabilityTopic",
+        "table.name.format": "events",
+        "tasks.max": "1",
+        "connection.url": "jdbc:postgresql://postgresdb/tradeserver?user=myuser&password=mypassword&ssl=false",
+        "auto.create": "true",
+        "transforms": "TimestampConverter",
+        "transforms.TimestampConverter.type": "org.apache.kafka.connect.transforms.TimestampConverter$Value",
+        "transforms.TimestampConverter.field": "timestamp",
+        "transforms.TimestampConverter.target.type": "Timestamp",
+        "transforms.TimestampConverter.format": "yyyy-MM-dd HH:mm:ss"
+    }
+}

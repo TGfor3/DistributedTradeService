@@ -1,0 +1,14 @@
+auth:
+  type: DISABLED
+kafka:
+  clusters:
+  - bootstrapServers: kafka:29092
+    kafkaConnect:
+    - address: http://connect:8083
+      name: connector
+    name: kafka
+    properties: {}
+    readOnly: false
+rbac:
+  roles: []
+webclient: {}

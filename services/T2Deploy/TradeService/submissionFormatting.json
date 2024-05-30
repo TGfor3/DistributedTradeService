@@ -1,0 +1,16 @@
+{
+    "Buy": {
+        "clientID": -1,
+        "ticker": "",
+        "buyAmount": -1
+    },
+    "Sell": {
+        "clientID": -1,
+        "ticker": "",
+        "sellAmount": -1
+    },
+    "AddClient": {
+        "clientID": -1,
+        "startingBalance": -1
+    }
+}

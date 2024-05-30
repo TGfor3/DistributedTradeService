@@ -1,0 +1,19 @@
+{
+    "1": {
+        "operations": {
+            "duration": {
+                "operationType": "PLUS",
+                "keys": ["startTime", "endTime"],
+                "resultKey": "totalDuration"
+            },
+            "sensorCalculation": {
+                "operationType": "PLUS",
+                "keys": [
+                    "sensorA_TIMES_sensorB",
+                    "sensorC"
+                ],
+                "resultKey": "sensorValue"
+            }
+        }
+    }
+}

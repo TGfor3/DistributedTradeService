@@ -1,0 +1,7 @@
+_id,clientID,ticker,quantity,price,market value,price_last_updated,holding_last_updated
+1A,1,A,10,0,0,0,0
+1ABBV,1,ABBV,2,0,0,0,0
+1AACG,1,AACG,4,0,0,0,0
+2AAA,2,AAA,10,0,0,0,0
+3ABBV,3,ABBV,10,0,0,0,0
+3A,3,A,5,0,0,0,0
